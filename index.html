@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width"
+    />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link rel="stylesheet" href="css/leaflet.css" />
+    <link rel="stylesheet" href="css/L.Control.Layers.Tree.css" />
+    <link rel="stylesheet" href="css/qgis2web.css" />
+    <link rel="stylesheet" href="css/fontawesome-all.min.css" />
+    <link rel="stylesheet" href="css/leaflet.photon.css" />
+    <style>
+      html,
+      body,
+      #map {
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        margin: 0;
+      }
+#header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
+    background: rgba(0, 70, 120, 0.9);
+    color: #fff;
+    z-index: 999;
+    padding: 10px 20px;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+#header h1 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+#header p {
+    margin: 2px 0 0;
+    font-size: 13px;
+    opacity: 0.9;
+}
+
+#map {
+    position: absolute;
+    top: 70px;
+    bottom: 0;
+    width: 100%;
+}
+    </style>
+    
+    <title>Pemetaan Potensi Lahan Pertanian Kota Samarinda</title>
+    <link rel="icon" type="image/x-icon" href="data:image/jpeg;base64,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">
+  </head>
+  <body>
+    <div id="header">
+      <h1>Pemetaan Potensi Lahan Pertanian Kota Samarinda</h1>
+      <p>Ditinjau dari Kelas Kemiringan Lereng</p>
+    </div>
+
+    <div id="map"></div>
+    <script src="js/qgis2web_expressions.js"></script>
+    <script src="js/leaflet.js"></script>
+    <script src="js/L.Control.Layers.Tree.min.js"></script>
+    <script src="js/leaflet.rotatedMarker.js"></script>
+    <script src="js/leaflet.pattern.js"></script>
+    <script src="js/leaflet-hash.js"></script>
+    <script src="js/Autolinker.min.js"></script>
+    <script src="js/rbush.min.js"></script>
+    <script src="js/labelgun.min.js"></script>
+    <script src="js/labels.js"></script>
+    <script src="js/leaflet.photon.js"></script>
+    <script src="data/kontur_4.js"></script>
+    <script src="data/hahaha_5.js"></script>
+    <script>
+      var highlightLayer;
+      function highlightFeature(e) {
+        highlightLayer = e.target;
+
+        if (
+          e.target.feature.geometry.type === "LineString" ||
+          e.target.feature.geometry.type === "MultiLineString"
+        ) {
+          highlightLayer.setStyle({
+            color: "rgba(255, 255, 0, 1.00)",
+          });
+        } else {
+          highlightLayer.setStyle({
+            fillColor: "rgba(255, 255, 0, 1.00)",
+            fillOpacity: 1,
+          });
+        }
+        highlightLayer.openPopup();
+      }
+      var map = L.map("map", {
+        zoomControl: false,
+        maxZoom: 28,
+        minZoom: 1,
+      }).fitBounds([
+        [-0.6308063769023458, 116.94376115612073],
+        [-0.3193680279312201, 117.40817802210648],
+      ]);
+      var hash = new L.Hash(map);
+      map.attributionControl.setPrefix(
+        '<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>'
+      );
+      var autolinker = new Autolinker({
+        truncate: { length: 30, location: "smart" },
+      });
+      // remove popup's row if "visible-with-data"
+      function removeEmptyRowsFromPopupContent(content, feature) {
+        var tempDiv = document.createElement("div");
+        tempDiv.innerHTML = content;
+        var rows = tempDiv.querySelectorAll("tr");
+        for (var i = 0; i < rows.length; i++) {
+          var td = rows[i].querySelector("td.visible-with-data");
+          var key = td ? td.id : "";
+          if (
+            td &&
+            td.classList.contains("visible-with-data") &&
+            feature.properties[key] == null
+          ) {
+            rows[i].parentNode.removeChild(rows[i]);
+          }
+        }
+        return tempDiv.innerHTML;
+      }
+      // modify popup if contains media
+      function addClassToPopupIfMedia(content, popup) {
+        var tempDiv = document.createElement("div");
+        tempDiv.innerHTML = content;
+        var imgTd = tempDiv.querySelector("td img");
+        if (imgTd) {
+          var src = imgTd.getAttribute("src");
+          if (/\.(jpg|jpeg|png|gif|bmp|webp|avif)$/i.test(src)) {
+            popup._contentNode.classList.add("media");
+            setTimeout(function () {
+              popup.update();
+            }, 10);
+          } else if (/\.(mp3|wav|ogg|aac)$/i.test(src)) {
+            var audio = document.createElement("audio");
+            audio.controls = true;
+            audio.src = src;
+            imgTd.parentNode.replaceChild(audio, imgTd);
+            popup._contentNode.classList.add("media");
+            setTimeout(function () {
+              popup.setContent(tempDiv.innerHTML);
+              popup.update();
+            }, 10);
+          } else if (/\.(mp4|webm|ogg|mov)$/i.test(src)) {
+            var video = document.createElement("video");
+            video.controls = true;
+            video.src = src;
+            video.style.width = "400px";
+            video.style.height = "300px";
+            video.style.maxHeight = "60vh";
+            video.style.maxWidth = "60vw";
+            imgTd.parentNode.replaceChild(video, imgTd);
+            popup._contentNode.classList.add("media");
+            // Aggiorna il popup quando il video carica i metadati
+            video.addEventListener("loadedmetadata", function () {
+              popup.update();
+            });
+            setTimeout(function () {
+              popup.setContent(tempDiv.innerHTML);
+              popup.update();
+            }, 10);
+          } else {
+            popup._contentNode.classList.remove("media");
+          }
+        } else {
+          popup._contentNode.classList.remove("media");
+        }
+      }
+      var zoomControl = L.control
+        .zoom({
+          position: "topleft",
+        })
+        .addTo(map);
+      var bounds_group = new L.featureGroup([]);
+      function setBounds() {}
+      map.createPane("pane_ESRISatelliteArcGISWorld_Imagery_0");
+      map.getPane("pane_ESRISatelliteArcGISWorld_Imagery_0").style.zIndex = 400;
+      var layer_ESRISatelliteArcGISWorld_Imagery_0 = L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        {
+          pane: "pane_ESRISatelliteArcGISWorld_Imagery_0",
+          opacity: 1.0,
+          attribution: "",
+          minZoom: 1,
+          maxZoom: 28,
+          minNativeZoom: 0,
+          maxNativeZoom: 19,
+        }
+      );
+      layer_ESRISatelliteArcGISWorld_Imagery_0;
+      map.addLayer(layer_ESRISatelliteArcGISWorld_Imagery_0);
+      map.createPane("pane_tes2_1");
+      map.getPane("pane_tes2_1").style.zIndex = 401;
+      var img_tes2_1 = "data/tes2_1.png";
+      var img_bounds_tes2_1 = [
+        [-0.7070207019999999, 117.047179718],
+        [-0.315856586, 117.302055206],
+      ];
+      var layer_tes2_1 = new L.imageOverlay(img_tes2_1, img_bounds_tes2_1, {
+        pane: "pane_tes2_1",
+      });
+      bounds_group.addLayer(layer_tes2_1);
+      map.addLayer(layer_tes2_1);
+      map.createPane("pane_tes2_2");
+      map.getPane("pane_tes2_2").style.zIndex = 402;
+      var img_tes2_2 = "data/tes2_2.png";
+      var img_bounds_tes2_2 = [
+        [-0.7070207019999999, 117.047179718],
+        [-0.315856586, 117.302055206],
+      ];
+      var layer_tes2_2 = new L.imageOverlay(img_tes2_2, img_bounds_tes2_2, {
+        pane: "pane_tes2_2",
+      });
+      bounds_group.addLayer(layer_tes2_2);
+      map.addLayer(layer_tes2_2);
+      map.createPane("pane_Kemiringan_lereng_3");
+      map.getPane("pane_Kemiringan_lereng_3").style.zIndex = 403;
+      var img_Kemiringan_lereng_3 = "data/Kemiringan_lereng_3.png";
+      var img_bounds_Kemiringan_lereng_3 = [
+        [-0.7070207019999999, 117.047179718],
+        [-0.315856586, 117.302055206],
+      ];
+      var layer_Kemiringan_lereng_3 = new L.imageOverlay(
+        img_Kemiringan_lereng_3,
+        img_bounds_Kemiringan_lereng_3,
+        { pane: "pane_Kemiringan_lereng_3" }
+      );
+      bounds_group.addLayer(layer_Kemiringan_lereng_3);
+      map.addLayer(layer_Kemiringan_lereng_3);
+      function pop_kontur_4(feature, layer) {
+        layer.on({
+          mouseout: function (e) {
+            for (var i in e.target._eventParents) {
+              if (typeof e.target._eventParents[i].resetStyle === "function") {
+                e.target._eventParents[i].resetStyle(e.target);
+              }
+            }
+            if (typeof layer.closePopup == "function") {
+              layer.closePopup();
+            } else {
+              layer.eachLayer(function (feature) {
+                feature.closePopup();
+              });
+            }
+          },
+          mouseover: highlightFeature,
+        });
+var popupContent =
+  '<table>\
+    <tr>\
+      <th scope="row">Elevasi</th>\
+      <td class="visible-with-data" id="ELEV">' +
+  (feature.properties["ELEV"] !== null
+    ? autolinker.link(
+        String(feature.properties["ELEV"])
+          .replace(/'/g, "'")
+          .toLocaleString()
+      ) + " mdpl"
+    : "-") +
+  '</td>\
+    </tr>\
+  </table>';
+
+        var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+        layer.on("popupopen", function (e) {
+          addClassToPopupIfMedia(content, e.popup);
+        });
+        layer.bindPopup(content, { maxHeight: 400 });
+      }
+
+      function style_kontur_4_0() {
+        return {
+          pane: "pane_kontur_4",
+          opacity: 1,
+          color: "rgba(196,60,57,1.0)",
+          dashArray: "",
+          lineCap: "square",
+          lineJoin: "bevel",
+          weight: 1.0,
+          fillOpacity: 0,
+          interactive: true,
+        };
+      }
+      map.createPane("pane_kontur_4");
+      map.getPane("pane_kontur_4").style.zIndex = 404;
+      map.getPane("pane_kontur_4").style["mix-blend-mode"] = "normal";
+      var layer_kontur_4 = new L.geoJson(json_kontur_4, {
+        attribution: "",
+        interactive: true,
+        dataVar: "json_kontur_4",
+        layerName: "layer_kontur_4",
+        pane: "pane_kontur_4",
+        onEachFeature: pop_kontur_4,
+        style: style_kontur_4_0,
+      });
+      bounds_group.addLayer(layer_kontur_4);
+      map.addLayer(layer_kontur_4);
+      function pop_hahaha_5(feature, layer) {
+        layer.on({
+          mouseout: function (e) {
+            for (var i in e.target._eventParents) {
+              if (typeof e.target._eventParents[i].resetStyle === "function") {
+                e.target._eventParents[i].resetStyle(e.target);
+              }
+            }
+            if (typeof layer.closePopup == "function") {
+              layer.closePopup();
+            } else {
+              layer.eachLayer(function (feature) {
+                feature.closePopup();
+              });
+            }
+          },
+          mouseover: highlightFeature,
+        });
+    var popupContent =
+  '<table>\
+    <tr>\
+      <th colspan="2" style="text-align:center;">Informasi Potensi Lahan Pertanian</th>\
+    </tr>\
+    <tr>\
+      <th>Kecamatan</th>\
+      <td>' + (feature.properties["NAMOBJ"] ?? "-") + '</td>\
+    </tr>\
+    <tr>\
+      <th>Lereng 0-8% (Datar)</th>\
+      <td>' + (feature.properties["K1_0_8_ha"] ?? 0) + ' ha</td>\
+    </tr>\
+    <tr>\
+      <th>Lereng 8-15% (Landai)</th>\
+      <td>' + (feature.properties["K2_8_15_ha"] ?? 0) + ' ha</td>\
+    </tr>\
+    <tr>\
+      <th>Lereng 15-25% (Agak Curam)</th>\
+      <td>' + (feature.properties["K3_15_25_h"] ?? 0) + ' ha</td>\
+    </tr>\
+    <tr>\
+      <th>Lereng 25-45% (Curam)</th>\
+      <td>' + (feature.properties["K4_25_45_h"] ?? 0) + ' ha</td>\
+    </tr>\
+    <tr>\
+      <th>Lereng >45% (Sangat Curam)</th>\
+      <td>' + (feature.properties["K5_45_58_h"] ?? 0) + ' ha</td>\
+    </tr>\
+    <tr>\
+      <th>Total Luas</th>\
+      <td><b>' + (feature.properties["Total_ha"] ?? 0) + ' ha</b></td>\
+    </tr>\
+    <tr>\
+      <th>Potensi Pertanian</th>\
+      <td><b>' + (feature.properties["Potensi"] ?? "-") + '</b></td>\
+    </tr>\
+  </table>';
+
+        var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+        layer.on("popupopen", function (e) {
+          addClassToPopupIfMedia(content, e.popup);
+        });
+        layer.bindPopup(content, { maxHeight: 400 });
+      }
+
+      function style_hahaha_5_0(feature) {
+        switch (String(feature.properties["NAMOBJ"])) {
+          case "LOAJANAN HILIR":
+            return {
+              pane: "pane_hahaha_5",
+              opacity: 1,
+              color: "rgba(35,35,35,1.0)",
+              dashArray: "",
+              lineCap: "butt",
+              lineJoin: "miter",
+              weight: 1.0,
+              fill: true,
+              fillOpacity: 0.45,
+              fillColor: "rgba(240,132,103,1.0)",
+              interactive: true,
+            };
+            break;
+          case "PALARAN":
+            return {
+              pane: "pane_hahaha_5",
+              opacity: 1,
+              color: "rgba(35,35,35,1.0)",
+              dashArray: "",
+              lineCap: "butt",
+              lineJoin: "miter",
+              weight: 1.0,
+              fill: true,
+              fillOpacity: 0.45,
+              fillColor: "rgba(231,63,211,1.0)",
+              interactive: true,
+            };
+            break;
+          case "SAMARINDA ILIR":
+            return {
+              pane: "pane_hahaha_5",
+              opacity: 1,
+              color: "rgba(35,35,35,1.0)",
+              dashArray: "",
+              lineCap: "butt",
+              lineJoin: "miter",
+              weight: 1.0,
+              fill: true,
+              fillOpacity: 0.45,
+              fillColor: "rgba(174,209,93,1.0)",
+              interactive: true,
+            };
+            break;
+          case "SAMARINDA ULU":
+            return {
+              pane: "pane_hahaha_5",
+              opacity: 1,
+              color: "rgba(35,35,35,1.0)",
+              dashArray: "",
+              lineCap: "butt",
+              lineJoin: "miter",
+              weight: 1.0,
+              fill: true,
+              fillOpacity: 0.45,
+              fillColor: "rgba(229,183,45,1.0)",
+              interactive: true,
+            };
+            break;
+          case "SAMARINDA UTARA":
+            return {
+              pane: "pane_hahaha_5",
+              opacity: 1,
+              color: "rgba(35,35,35,1.0)",
+              dashArray: "",
+              lineCap: "butt",
+              lineJoin: "miter",
+              weight: 1.0,
+              fill: true,
+              fillOpacity: 0.45,
+              fillColor: "rgba(135,30,209,1.0)",
+              interactive: true,
+            };
+            break;
+          case "SAMARINDAKOTA":
+            return {
+              pane: "pane_hahaha_5",
+              opacity: 1,
+              color: "rgba(35,35,35,1.0)",
+              dashArray: "",
+              lineCap: "butt",
+              lineJoin: "miter",
+              weight: 1.0,
+              fill: true,
+              fillOpacity: 0.45,
+              fillColor: "rgba(23,229,102,1.0)",
+              interactive: true,
+            };
+            break;
+          case "SAMARINDASEBERANG":
+            return {
+              pane: "pane_hahaha_5",
+              opacity: 1,
+              color: "rgba(35,35,35,1.0)",
+              dashArray: "",
+              lineCap: "butt",
+              lineJoin: "miter",
+              weight: 1.0,
+              fill: true,
+              fillOpacity: 0.45,
+              fillColor: "rgba(217,28,91,1.0)",
+              interactive: true,
+            };
+            break;
+          case "SAMBUTAN":
+            return {
+              pane: "pane_hahaha_5",
+              opacity: 1,
+              color: "rgba(35,35,35,1.0)",
+              dashArray: "",
+              lineCap: "butt",
+              lineJoin: "miter",
+              weight: 1.0,
+              fill: true,
+              fillOpacity: 0.45,
+              fillColor: "rgba(128,177,223,1.0)",
+              interactive: true,
+            };
+            break;
+          case "SUNGAIKUNJANG":
+            return {
+              pane: "pane_hahaha_5",
+              opacity: 1,
+              color: "rgba(35,35,35,1.0)",
+              dashArray: "",
+              lineCap: "butt",
+              lineJoin: "miter",
+              weight: 1.0,
+              fill: true,
+              fillOpacity: 0.45,
+              fillColor: "rgba(45,204,193,1.0)",
+              interactive: true,
+            };
+            break;
+          case "SUNGAIPINANG":
+            return {
+              pane: "pane_hahaha_5",
+              opacity: 1,
+              color: "rgba(35,35,35,1.0)",
+              dashArray: "",
+              lineCap: "butt",
+              lineJoin: "miter",
+              weight: 1.0,
+              fill: true,
+              fillOpacity: 0.45,
+              fillColor: "rgba(75,204,49,1.0)",
+              interactive: true,
+            };
+            break;
+          default:
+            return {
+              pane: "pane_hahaha_5",
+              opacity: 0.45,
+              color: "rgba(35,35,35,1.0)",
+              dashArray: "",
+              lineCap: "butt",
+              lineJoin: "miter",
+              weight: 1.0,
+              fill: true,
+              fillOpacity: 1,
+              fillColor: "rgba(137,134,220,1.0)",
+              interactive: true,
+            };
+            break;
+        }
+      }
+      map.createPane("pane_hahaha_5");
+      map.getPane("pane_hahaha_5").style.zIndex = 405;
+      map.getPane("pane_hahaha_5").style["mix-blend-mode"] = "normal";
+      var layer_hahaha_5 = new L.geoJson(json_hahaha_5, {
+        attribution: "",
+        interactive: true,
+        dataVar: "json_hahaha_5",
+        layerName: "layer_hahaha_5",
+        pane: "pane_hahaha_5",
+        onEachFeature: pop_hahaha_5,
+        style: style_hahaha_5_0,
+      });
+      bounds_group.addLayer(layer_hahaha_5);
+      map.addLayer(layer_hahaha_5);
+      var overlaysTree = [
+        {
+          label:
+            'Kecamatan<br /><table><tr><td style="text-align: center;"><img src="legend/hahaha_5_LOAJANANHILIR0.png" /></td><td>LOAJANAN HILIR</td></tr><tr><td style="text-align: center;"><img src="legend/hahaha_5_PALARAN1.png" /></td><td>PALARAN</td></tr><tr><td style="text-align: center;"><img src="legend/hahaha_5_SAMARINDAILIR2.png" /></td><td>SAMARINDA ILIR</td></tr><tr><td style="text-align: center;"><img src="legend/hahaha_5_SAMARINDAULU3.png" /></td><td>SAMARINDA ULU</td></tr><tr><td style="text-align: center;"><img src="legend/hahaha_5_SAMARINDAUTARA4.png" /></td><td>SAMARINDA UTARA</td></tr><tr><td style="text-align: center;"><img src="legend/hahaha_5_SAMARINDAKOTA5.png" /></td><td>SAMARINDAKOTA</td></tr><tr><td style="text-align: center;"><img src="legend/hahaha_5_SAMARINDASEBERANG6.png" /></td><td>SAMARINDASEBERANG</td></tr><tr><td style="text-align: center;"><img src="legend/hahaha_5_SAMBUTAN7.png" /></td><td>SAMBUTAN</td></tr><tr><td style="text-align: center;"><img src="legend/hahaha_5_SUNGAIKUNJANG8.png" /></td><td>SUNGAIKUNJANG</td></tr><tr><td style="text-align: center;"><img src="legend/hahaha_5_SUNGAIPINANG9.png" /></td><td>SUNGAIPINANG</td></tr><tr><td style="text-align: center;"><img src="legend/hahaha_5_10.png" /></td><td></td></tr></table>',
+          layer: layer_hahaha_5,
+        },
+        {
+          label: '<img src="legend/kontur_4.png" /> kontur',
+          layer: layer_kontur_4,
+        },
+        { label: "Kemiringan Lereng", layer: layer_Kemiringan_lereng_3 },
+        { label: "Hillshade", layer: layer_tes2_2 },
+        { label: "Topografi", layer: layer_tes2_1 },
+        {
+          label: "ESRI Satellite (ArcGIS/World_Imagery)",
+          layer: layer_ESRISatelliteArcGISWorld_Imagery_0,
+          radioGroup: "bm",
+        },
+      ];
+      var lay = L.control.layers.tree(null, overlaysTree, {
+        //namedToggle: true,
+        //selectorBack: false,
+        //closedSymbol: '&#8862; &#x1f5c0;',
+        //openedSymbol: '&#8863; &#x1f5c1;',
+        //collapseAll: 'Collapse all',
+        //expandAll: 'Expand all',
+        collapsed: false,
+      });
+      lay.addTo(map);
+      document.addEventListener("DOMContentLoaded", function () {
+        // set new Layers List height which considers toggle icon
+        function newLayersListHeight() {
+          var layerScrollbarElement = document.querySelector(
+            ".leaflet-control-layers-scrollbar"
+          );
+          if (layerScrollbarElement) {
+            var layersListElement = document.querySelector(
+              ".leaflet-control-layers-list"
+            );
+            var originalHeight =
+              layersListElement.style.height ||
+              window.getComputedStyle(layersListElement).height;
+            var newHeight = parseFloat(originalHeight) - 50;
+            layersListElement.style.height = newHeight + "px";
+          }
+        }
+        var isLayersListExpanded = true;
+        var controlLayersElement = document.querySelector(
+          ".leaflet-control-layers"
+        );
+        var toggleLayerControl = document.querySelector(
+          ".leaflet-control-layers-toggle"
+        );
+        // toggle Collapsed/Expanded and apply new Layers List height
+        toggleLayerControl.addEventListener("click", function () {
+          if (isLayersListExpanded) {
+            controlLayersElement.classList.remove(
+              "leaflet-control-layers-expanded"
+            );
+          } else {
+            controlLayersElement.classList.add(
+              "leaflet-control-layers-expanded"
+            );
+          }
+          isLayersListExpanded = !isLayersListExpanded;
+          newLayersListHeight();
+        });
+        // apply new Layers List height if toggle layerstree
+        if (controlLayersElement) {
+          controlLayersElement.addEventListener("click", function (event) {
+            var toggleLayerHeaderPointer = event.target.closest(
+              ".leaflet-layerstree-header-pointer span"
+            );
+            if (toggleLayerHeaderPointer) {
+              newLayersListHeight();
+            }
+          });
+        }
+        // Collapsed/Expanded at Start to apply new height
+        setTimeout(function () {
+          toggleLayerControl.click();
+        }, 10);
+        setTimeout(function () {
+          toggleLayerControl.click();
+        }, 10);
+        // Collapsed touch/small screen
+        var isSmallScreen = window.innerWidth < 650;
+        if (isSmallScreen) {
+          setTimeout(function () {
+            controlLayersElement.classList.remove(
+              "leaflet-control-layers-expanded"
+            );
+            isLayersListExpanded = !isLayersListExpanded;
+          }, 500);
+        }
+      });
+      setBounds();
+      L.ImageOverlay.include({
+        getBounds: function () {
+          return this._bounds;
+        },
+      });
+      resetLabels([layer_kontur_4]);
+      map.on("zoomend", function () {
+        resetLabels([layer_kontur_4]);
+      });
+      map.on("layeradd", function () {
+        resetLabels([layer_kontur_4]);
+      });
+      map.on("layerremove", function () {
+        resetLabels([layer_kontur_4]);
+      });
+    </script>
+  </body>
+</html>
